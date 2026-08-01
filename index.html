@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Face Atlas — Regional Face Trainer</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #1a1e26;
+    --panel2: #232936;
+    --text: #e8eaf0;
+    --dim: #8a92a6;
+    --accent: #f5a623;
+    --good: #3ecf8e;
+    --bad: #ef5b5b;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  h1 { font-size: 20px; letter-spacing: 0.5px; }
+  h1 span { color: var(--accent); }
+  nav { display: flex; gap: 8px; }
+  .tab {
+    background: var(--panel);
+    border: 1px solid #2c3444;
+    color: var(--dim);
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .tab.active { background: var(--accent); color: #14161c; border-color: var(--accent); font-weight: 600; }
+  main { width: 100%; max-width: 860px; padding: 12px 20px 40px; }
+
+  .filters { display: flex; gap: 8px; margin: 8px 0 16px; flex-wrap: wrap; }
+  .chip {
+    background: var(--panel);
+    border: 1px solid #2c3444;
+    color: var(--dim);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .chip.on { border-color: var(--accent); color: var(--accent); }
+
+  .card {
+    background: var(--panel);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .face-wrap {
+    width: min(380px, 80vw);
+    aspect-ratio: 3/4;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--panel2);
+    position: relative;
+  }
+  .face-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .reveal-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 14px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  button.primary {
+    background: var(--accent);
+    color: #14161c;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.ghost {
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid #2c3444;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 480px;
+  }
+  .choices button {
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid #2c3444;
+    padding: 14px 10px;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .choices button:hover { background: #2c3444; }
+  .choices button.correct { background: var(--good); border-color: var(--good); color: #08130d; font-weight: 700; }
+  .choices button.wrong { background: var(--bad); border-color: var(--bad); color: #fff; font-weight: 700; }
+  .choices button:disabled { cursor: default; opacity: 0.9; }
+
+  .scorebar {
+    display: flex;
+    gap: 18px;
+    font-size: 14px;
+    color: var(--dim);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .scorebar b { color: var(--text); }
+  .scorebar .streak b { color: var(--accent); }
+
+  .statgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    width: 100%;
+  }
+  .stat {
+    background: var(--panel2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  .stat .bar {
+    height: 6px; border-radius: 3px; background: #2c3444; margin-top: 8px; overflow: hidden;
+  }
+  .stat .bar i { display: block; height: 100%; background: var(--good); }
+  .stat small { color: var(--dim); }
+  .empty {
+    text-align: center; color: var(--dim); padding: 60px 20px; line-height: 1.6;
+  }
+  .feedback { font-size: 16px; font-weight: 600; min-height: 24px; }
+  .feedback.good { color: var(--good); }
+  .feedback.bad { color: var(--bad); }
+
+  .trait-card {
+    background: var(--panel2);
+    border: 1px solid #2c3444;
+    border-radius: 12px;
+    padding: 14px 16px;
+    width: 100%;
+    max-width: 480px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .trait-card .trait-title { font-weight: 700; margin-bottom: 6px; color: var(--accent); }
+  .trait-card ul { padding-left: 18px; }
+  .trait-card li { margin: 3px 0; }
+  .trait-card .contrast {
+    margin-top: 8px; padding: 8px 10px;
+    background: rgba(245,166,35,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+  }
+  .trait-card .trait-foot { margin-top: 8px; font-size: 11px; color: var(--dim); }
+  .scorebar .level b { color: var(--accent); }
+
+  .trait-index { display: flex; flex-direction: column; gap: 12px; }
+  .trait-index .trait-card { max-width: none; }
+
+  .learn-regions { margin-bottom: 10px; }
+  .learn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .learn-face { aspect-ratio: 3/4; border-radius: 10px; overflow: hidden; }
+  .learn-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .learn-grid + .trait-card { max-width: none; }
+  .pack-chip.disabled { opacity: 0.4; cursor: default; }
+
+  .poster-wrap { width: 100%; }
+  .poster-wrap img { width: 100%; border-radius: 10px; display: block; margin-bottom: 10px; }
+  .poster-wrap h3 { font-size: 15px; color: var(--accent); margin: 4px 0 8px; }
+
+  .duel-q { font-size: 19px; color: var(--text); }
+  .duel-q b { color: var(--accent); }
+  .duel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    max-width: 560px;
+  }
+  .duel-face {
+    position: relative;
+    aspect-ratio: 3/4;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: transform 0.1s;
+  }
+  .duel-face:active { transform: scale(0.98); }
+  .duel-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .duel-face .duel-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 8px; text-align: center; font-weight: 700;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: #fff;
+  }
+  .duel-right { border-color: var(--good); }
+  .duel-wrong-dim { opacity: 0.75; }
+  .duel-tapped-wrong { border-color: var(--bad); opacity: 1; }
+
+  /* Flash mode: face hides after N seconds — answer from memory */
+  .flash-cover {
+    position: absolute; inset: 0;
+    background: var(--panel2);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 8px; color: var(--dim); font-size: 15px;
+    z-index: 2;
+  }
+  .flash-cover .q { font-size: 52px; }
+
+  .blind-spots { width: 100%; }
+  .blind-spots .bs-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--panel2); border-radius: 8px; padding: 8px 12px; margin-top: 6px;
+    font-size: 14px;
+  }
+  .blind-spots .bs-row b { color: var(--bad); }
+
+  /* Mobile-first: this is destined to be a phone game (9:16). */
+  @media (max-width: 640px) {
+    header { padding: 10px 12px 4px; }
+    h1 { font-size: 17px; }
+    h1 small { display: none; }
+    .tab { padding: 6px 12px; font-size: 13px; }
+    main { padding: 6px 10px calc(20px + env(safe-area-inset-bottom)); }
+    .card { padding: 12px; gap: 10px; }
+    .face-wrap { width: 100%; max-height: 52vh; aspect-ratio: 3/4; }
+    .choices { gap: 8px; }
+    .choices button { padding: 16px 8px; font-size: 16px; } /* thumb-sized */
+    button.primary { width: 100%; padding: 14px; }
+    .scorebar { font-size: 12px; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Face <span>Atlas</span> <small style="color:var(--dim);font-weight:400;font-size:13px">regional face trainer</small></h1>
+  <nav>
+    <button class="tab active" data-mode="learn">Learn</button>
+    <button class="tab" data-mode="quiz">Quiz</button>
+    <button class="tab" data-mode="duel">Duel</button>
+    <button class="tab" data-mode="traits">Traits</button>
+    <button class="tab" data-mode="stats">Stats</button>
+  </nav>
+</header>
+<main>
+  <div class="filters" id="packFilters"></div>
+  <div class="filters" id="genderFilters">
+    <span class="chip on" data-g="all">All</span>
+    <span class="chip" data-g="female">Women</span>
+    <span class="chip" data-g="male">Men</span>
+    <span class="chip style-chip" data-g="hot" style="display:none">🔥 Hot</span>
+    <span class="chip style-chip" data-g="fitness" style="display:none">💪 Fitness</span>
+    <span style="width:12px"></span>
+    <span class="chip flash-chip" data-f="0">⏱ Off</span>
+    <span class="chip flash-chip on" data-f="3">⏱ 3s</span>
+    <span class="chip flash-chip" data-f="5">⏱ 5s</span>
+  </div>
+  <div id="view"></div>
+</main>
+<script src="data.js"></script>
+<script>
+// Difficulty: choice count AND region pool grow with lifetime correct answers
+// IN THE ACTIVE PACK. Rookie starts on that pack's visually distant regions;
+// confusable neighbors unlock later. Pools live in data.js per pack.
+const LEVELS = [
+  { name: 'Rookie', choices: 2, at: 0, poolKey: 'rookie' },
+  { name: 'Spotter', choices: 3, at: 15, poolKey: 'spotter' },
+  { name: 'Expert', choices: 4, at: 40, poolKey: null } // null = all pack regions
+];
+const PACK_KEY = 'faceatlas_pack_v1';
+let activePackId = localStorage.getItem(PACK_KEY) || 'mideast';
+function activePack() {
+  return PACKS.find(p => p.id === activePackId) || PACKS[0];
+}
+function lifetimeRight() {
+  const s = loadStats();
+  return activePack().regions.reduce((n, r) => n + ((s[r] || {}).right || 0), 0);
+}
+function currentLevel() {
+  const r = lifetimeRight();
+  let lvl = LEVELS[0];
+  for (const L of LEVELS) if (r >= L.at) lvl = L;
+  return lvl;
+}
+function levelPool() {
+  const pack = activePack();
+  const p = currentLevel().poolKey ? pack[currentLevel().poolKey] : pack.regions;
+  return REGIONS.filter(r => p.includes(r));
+}
+
+// Confusion matrix: conf[actual][picked] = how often the player said "picked"
+// when the answer was "actual". Drives both distractor choice and blind-spot stats.
+const CONF_KEY = 'faceatlas_conf_v1';
+function loadConf() {
+  try { return JSON.parse(localStorage.getItem(CONF_KEY)) || {}; } catch { return {}; }
+}
+function bumpConf(actual, picked) {
+  if (actual === picked) return;
+  const c = loadConf();
+  c[actual] = c[actual] || {};
+  c[actual][picked] = (c[actual][picked] || 0) + 1;
+  localStorage.setItem(CONF_KEY, JSON.stringify(c));
+}
+// Weighted distractor sampling: your personal confusions dominate, then the
+// static lookalike map, then chance — so wrong answers you fall for reappear.
+function pickDistractors(actual, n, pool) {
+  const conf = loadConf()[actual] || {};
+  const totalConf = Object.values(conf).reduce((a, b) => a + b, 0);
+  let cands = pool.filter(r => r !== actual).map(r => {
+    const w = 1
+      + ((NEIGHBORS[actual] || []).includes(r) ? 2 : 0)
+      + (totalConf ? 6 * (conf[r] || 0) / totalConf : 0);
+    return { r, w };
+  });
+  const out = [];
+  while (out.length < n && cands.length) {
+    const total = cands.reduce((a, c) => a + c.w, 0);
+    let roll = Math.random() * total;
+    let idx = 0;
+    for (; idx < cands.length; idx++) { roll -= cands[idx].w; if (roll <= 0) break; }
+    idx = Math.min(idx, cands.length - 1);
+    out.push(cands[idx].r);
+    cands.splice(idx, 1);
+  }
+  return out;
+}
+
+// Flash mode: in Quiz/Duel the face is covered after N seconds, so you answer
+// from the glimpse — trains fast recognition. 0 = off.
+const FLASH_KEY = 'faceatlas_flash_v1';
+let flashSecs = parseInt(localStorage.getItem(FLASH_KEY) || '3', 10);
+let flashTimers = [];
+function clearFlash() {
+  flashTimers.forEach(t => clearTimeout(t));
+  flashTimers = [];
+}
+function armFlash(selector) {
+  clearFlash();
+  if (!flashSecs) return;
+  flashTimers.push(setTimeout(() => {
+    document.querySelectorAll(selector).forEach(el => {
+      if (el.querySelector('.flash-cover')) return;
+      const c = document.createElement('div');
+      c.className = 'flash-cover';
+      c.innerHTML = '<div class="q">🙈</div><div>From memory…</div>';
+      el.appendChild(c);
+    });
+  }, flashSecs * 1000));
+}
+function unflash() {
+  clearFlash();
+  document.querySelectorAll('.flash-cover').forEach(el => el.remove());
+}
+
+let FACES = [];
+let REGIONS = [];
+let mode = 'learn';
+let gender = 'all';
+let current = null;
+let revealed = false;
+let session = { right: 0, wrong: 0, streak: 0, best: 0 };
+let answered = false;
+
+const LS_KEY = 'faceatlas_stats_v1';
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; }
+}
+function saveStats(s) { localStorage.setItem(LS_KEY, JSON.stringify(s)); }
+function bumpStat(region, ok) {
+  const s = loadStats();
+  s[region] = s[region] || { right: 0, wrong: 0 };
+  ok ? s[region].right++ : s[region].wrong++;
+  saveStats(s);
+}
+
+// gender filter values: all/female/male = standard faces only; a style name
+// ('hot', 'fitness') selects that styled set instead — its own category.
+function pool(regionLimit) {
+  return FACES.filter(f => {
+    if (regionLimit && !regionLimit.includes(f.region)) return false;
+    if (gender === 'hot' || gender === 'fitness') return f.style === gender;
+    if (f.style) return false; // styled faces stay out of standard play
+    return gender === 'all' || f.gender === gender;
+  });
+}
+function pick(regionLimit) {
+  const p = pool(regionLimit);
+  if (!p.length) return null;
+  let f;
+  do { f = p[Math.floor(Math.random() * p.length)]; } while (p.length > 1 && current && f.file === current.file);
+  return f;
+}
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const view = document.getElementById('view');
+
+function render() {
+  unflash();
+  if (!FACES.length) {
+    view.innerHTML = '<div class="empty">No faces loaded yet.<br>Run the harvest step to fill <code>faces/</code> and <code>manifest.json</code>.</div>';
+    return;
+  }
+  if (mode === 'learn') renderLearn();
+  else if (mode === 'quiz') renderQuiz();
+  else if (mode === 'duel') renderDuel();
+  else if (mode === 'traits') renderTraits();
+  else renderStats();
+}
+
+// Learn mode: region browser — see ALL of a region's faces at once so the
+// shared pattern pops out, with the trait card alongside. Flashcard drilling
+// lives in Quiz/Duel; Learn is for absorbing the prototype.
+let learnRegion = null;
+function renderLearn() {
+  const avail = REGIONS.filter(r => pool().some(f => f.region === r));
+  if (!avail.length) { view.innerHTML = '<div class="empty">No faces in this category for this pack yet.</div>'; return; }
+  if (!learnRegion || !avail.includes(learnRegion)) learnRegion = avail[0];
+  const faces = pool().filter(f => f.region === learnRegion);
+  view.innerHTML = `
+    <div class="filters learn-regions">
+      ${avail.map(r => `<span class="chip ${r === learnRegion ? 'on' : ''}" data-r="${r}">${r}</span>`).join('')}
+    </div>
+    <div class="card" style="align-items:stretch">
+      <div class="learn-grid">
+        ${faces.map(f => `<div class="learn-face"><img loading="lazy" src="faces/${f.file}" alt="${f.region}"></div>`).join('')}
+      </div>
+      ${traitCardHTML(learnRegion)}
+    </div>`;
+  document.querySelectorAll('.learn-regions .chip').forEach(c => {
+    c.onclick = () => { learnRegion = c.dataset.r; renderLearn(); };
+  });
+}
+
+function renderQuiz() {
+  const lvl = currentLevel();
+  if (!current || answered === 'advance') { current = pick(levelPool()); answered = false; }
+  const others = pickDistractors(current.region, lvl.choices - 1, levelPool());
+  const options = shuffle([current.region, ...others]);
+  view.innerHTML = `
+    <div class="card">
+      <div class="face-wrap"><img src="faces/${current.file}" alt="face"></div>
+      <div class="feedback" id="fb"></div>
+      <div class="choices" id="choices" style="grid-template-columns: repeat(${Math.min(lvl.choices, 2)}, 1fr)">
+        ${options.map(o => `<button data-r="${o}">${o}</button>`).join('')}
+      </div>
+      <div id="traitSlot"></div>
+      <div class="controls" style="display:none" id="nextWrap">
+        <button class="primary" id="nextBtn">Next →</button>
+      </div>
+      <div class="scorebar">
+        <span class="level">🎖 <b>${lvl.name}</b> (${lvl.choices} choices)</span>
+        <span>✅ <b>${session.right}</b></span>
+        <span>❌ <b>${session.wrong}</b></span>
+        <span class="streak">🔥 streak <b>${session.streak}</b></span>
+        <span>🏆 best <b>${session.best}</b></span>
+      </div>
+    </div>`;
+  armFlash('.face-wrap');
+  document.querySelectorAll('#choices button').forEach(btn => {
+    btn.onclick = () => {
+      if (answered) return;
+      answered = true;
+      unflash();
+      const ok = btn.dataset.r === current.region;
+      const picked = btn.dataset.r;
+      bumpStat(current.region, ok);
+      if (!ok) bumpConf(current.region, picked);
+      if (ok) { session.right++; session.streak++; session.best = Math.max(session.best, session.streak); }
+      else { session.wrong++; session.streak = 0; }
+      document.querySelectorAll('#choices button').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.r === current.region) b.classList.add('correct');
+        else if (b === btn && !ok) b.classList.add('wrong');
+      });
+      const fb = document.getElementById('fb');
+      fb.textContent = ok ? 'Correct!' : `Nope — that's ${current.region}.`;
+      fb.className = 'feedback ' + (ok ? 'good' : 'bad');
+      const lvlNow = currentLevel();
+      document.querySelector('.scorebar').innerHTML =
+        `<span class="level">🎖 <b>${lvlNow.name}</b> (${lvlNow.choices} choices)</span>` +
+        `<span>✅ <b>${session.right}</b></span><span>❌ <b>${session.wrong}</b></span>` +
+        `<span class="streak">🔥 streak <b>${session.streak}</b></span><span>🏆 best <b>${session.best}</b></span>`;
+      showTraitCard(current.region, ok ? null : picked);
+      if (!ok) flipCompare(picked);
+      document.getElementById('nextWrap').style.display = 'flex';
+      document.getElementById('nextBtn').onclick = () => { answered = 'advance'; renderQuiz(); };
+    };
+  });
+}
+
+// On a miss: flash an example face of the region the player wrongly picked,
+// then flip back to the correct face — visual contrast beats text.
+let flipTimer = null;
+function flipCompare(wrongRegion) {
+  const img = document.querySelector('.face-wrap img');
+  const wrap = document.querySelector('.face-wrap');
+  if (!img) return;
+  const example = shuffle(FACES.filter(f => f.region === wrongRegion && f.gender === current.gender))[0]
+               || shuffle(FACES.filter(f => f.region === wrongRegion))[0];
+  if (!example) return;
+  const origSrc = img.src;
+  let label = wrap.querySelector('.reveal-label');
+  if (!label) {
+    label = document.createElement('div');
+    label.className = 'reveal-label';
+    wrap.appendChild(label);
+  }
+  const showWrong = () => {
+    img.src = 'faces/' + example.file;
+    label.textContent = 'You picked: ' + wrongRegion;
+    label.style.background = 'linear-gradient(transparent, rgba(160,40,40,0.9))';
+  };
+  const showRight = () => {
+    img.src = origSrc;
+    label.textContent = 'Actual: ' + current.region;
+    label.style.background = 'linear-gradient(transparent, rgba(30,120,70,0.9))';
+  };
+  showWrong();
+  clearTimeout(flipTimer);
+  flipTimer = setTimeout(showRight, 1800);
+  // click the photo to toggle the comparison again
+  wrap.style.cursor = 'pointer';
+  wrap.onclick = () => {
+    clearTimeout(flipTimer);
+    if (img.src.includes(example.file)) showRight(); else { showWrong(); flipTimer = setTimeout(showRight, 1800); }
+  };
+}
+
+function traitInnerHTML(region, pickedWrong) {
+  const t = TRAITS[region];
+  if (!t) return '';
+  let contrast = '';
+  if (pickedWrong && t.confused && t.confused[pickedWrong]) {
+    contrast = `<div class="contrast">🆚 <b>vs ${pickedWrong}:</b> ${t.confused[pickedWrong]}</div>`;
+  }
+  return `
+      <div class="trait-title">📖 How to spot a ${region} face</div>
+      <ul>${t.cues.map(c => `<li>${c}</li>`).join('')}</ul>
+      ${contrast}
+      <div class="trait-foot">Broad tendencies with lots of overlap — cues, not rules.</div>`;
+}
+function traitCardHTML(region, pickedWrong) {
+  const inner = traitInnerHTML(region, pickedWrong);
+  return inner ? `<div class="trait-card">${inner}</div>` : '';
+}
+function showTraitCard(region, pickedWrong) {
+  const slot = document.getElementById('traitSlot');
+  if (slot) slot.innerHTML = traitCardHTML(region, pickedWrong);
+}
+
+// Duel: two faces side by side, "tap the {target}". The rival region is chosen
+// by the same confusion-weighted logic as quiz distractors.
+let duel = null;
+function renderDuel() {
+  if (!duel || duel.done === 'advance') {
+    const regs = levelPool();
+    if (regs.length < 2) { view.innerHTML = '<div class="empty">Need at least two regions.</div>'; return; }
+    const target = regs[Math.floor(Math.random() * regs.length)];
+    const rival = pickDistractors(target, 1, regs)[0];
+    const g = gender === 'all' ? (Math.random() < 0.5 ? 'male' : 'female') : gender;
+    const tFace = shuffle(FACES.filter(f => f.region === target && f.gender === g))[0];
+    const rFace = shuffle(FACES.filter(f => f.region === rival && f.gender === g))[0];
+    if (!tFace || !rFace) { duel = null; view.innerHTML = '<div class="empty">Not enough faces yet.</div>'; return; }
+    duel = { target, rival, faces: shuffle([tFace, rFace]), done: false };
+  }
+  const d = duel;
+  view.innerHTML = `
+    <div class="card">
+      <div class="duel-q">Tap the <b>${d.target}</b></div>
+      <div class="duel-grid">
+        ${d.faces.map((f, i) => `
+          <div class="duel-face" data-i="${i}">
+            <img src="faces/${f.file}" alt="face">
+            <div class="duel-label" style="display:none"></div>
+          </div>`).join('')}
+      </div>
+      <div class="feedback" id="fb"></div>
+      <div id="traitSlot"></div>
+      <div class="controls" style="display:none" id="nextWrap">
+        <button class="primary" id="nextBtn">Next →</button>
+      </div>
+      <div class="scorebar">
+        <span class="level">🎖 <b>${currentLevel().name}</b></span>
+        <span>✅ <b>${session.right}</b></span>
+        <span>❌ <b>${session.wrong}</b></span>
+        <span class="streak">🔥 streak <b>${session.streak}</b></span>
+      </div>
+    </div>`;
+  armFlash('.duel-face');
+  document.querySelectorAll('.duel-face').forEach(el => {
+    el.onclick = () => {
+      if (d.done) return;
+      d.done = true;
+      unflash();
+      const tapped = d.faces[+el.dataset.i];
+      const ok = tapped.region === d.target;
+      bumpStat(d.target, ok);
+      if (!ok) bumpConf(tapped.region, d.target); // mistook that region's face for the target
+      if (ok) { session.right++; session.streak++; session.best = Math.max(session.best, session.streak); }
+      else { session.wrong++; session.streak = 0; }
+      document.querySelectorAll('.duel-face').forEach((fe, i) => {
+        const f = d.faces[i];
+        const lab = fe.querySelector('.duel-label');
+        lab.style.display = 'block';
+        lab.textContent = f.region;
+        fe.classList.add(f.region === d.target ? 'duel-right' : 'duel-wrong-dim');
+        if (fe === el && !ok) fe.classList.add('duel-tapped-wrong');
+      });
+      const fb = document.getElementById('fb');
+      fb.textContent = ok ? 'Correct!' : `That one is ${tapped.region}.`;
+      fb.className = 'feedback ' + (ok ? 'good' : 'bad');
+      showTraitCard(d.target, ok ? d.rival : tapped.region);
+      document.getElementById('nextWrap').style.display = 'flex';
+      document.getElementById('nextBtn').onclick = () => { duel.done = 'advance'; renderDuel(); };
+    };
+  });
+}
+
+function renderTraits() {
+  // Study index: every region's cue card, with a sample face beside it.
+  const cards = REGIONS.map(r => {
+    const sample = FACES.find(f => f.region === r && (gender === 'all' || f.gender === gender));
+    const imgHtml = sample ? `<img src="faces/${sample.file}" alt="${r}" style="width:96px;aspect-ratio:3/4;object-fit:cover;border-radius:8px;float:right;margin:0 0 8px 10px">` : '';
+    return `<div class="trait-card">${imgHtml}${traitInnerHTML(r)}</div>`;
+  }).join('');
+  const posterFiles = POSTERS[activePackId] || [];
+  const postersHtml = posterFiles.length ? `
+    <div class="poster-wrap">
+      <h3>📜 Study charts</h3>
+      ${posterFiles.map(p => `<img loading="lazy" src="posters/${p}" alt="study chart">`).join('')}
+    </div>` : '';
+  view.innerHTML = `<div class="card" style="align-items:stretch">${postersHtml}<div class="trait-index">${cards}</div></div>`;
+}
+
+function renderStats() {
+  const s = loadStats();
+  const rows = REGIONS.map(r => {
+    const st = s[r] || { right: 0, wrong: 0 };
+    const total = st.right + st.wrong;
+    const pct = total ? Math.round(100 * st.right / total) : 0;
+    return `<div class="stat"><b>${r}</b><br><small>${st.right}/${total} correct (${total ? pct + '%' : '—'})</small>
+      <div class="bar"><i style="width:${pct}%"></i></div></div>`;
+  }).join('');
+  const conf = loadConf();
+  const pairs = [];
+  for (const actual of Object.keys(conf))
+    for (const picked of Object.keys(conf[actual]))
+      pairs.push({ actual, picked, n: conf[actual][picked] });
+  pairs.sort((a, b) => b.n - a.n);
+  const lvl = currentLevel();
+  const nextL = LEVELS.find(L => L.at > lifetimeRight());
+  const bsHtml = pairs.length ? `
+    <div class="blind-spots">
+      <b>🎯 Your blind spots</b>
+      ${pairs.slice(0, 6).map(p =>
+        `<div class="bs-row"><span>${p.actual} faces mistaken for <b>${p.picked}</b></span><span>×${p.n}</span></div>`).join('')}
+    </div>` : '';
+  view.innerHTML = `
+    <div class="card" style="align-items:stretch">
+      <div class="scorebar" style="justify-content:flex-start">
+        <span class="level">🎖 <b>${lvl.name}</b> — ${lvl.choices} choices, ${levelPool().length} regions</span>
+        ${nextL ? `<span>${nextL.at - lifetimeRight()} more correct to reach <b>${nextL.name}</b></span>` : '<span>Max level</span>'}
+      </div>
+      <div class="statgrid">${rows}</div>
+      ${bsHtml}
+      <div class="controls"><button class="ghost" id="resetBtn">Reset stats</button></div>
+    </div>`;
+  document.getElementById('resetBtn').onclick = () => {
+    if (confirm('Clear all accuracy stats?')) { localStorage.removeItem(LS_KEY); localStorage.removeItem(CONF_KEY); renderStats(); }
+  };
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    mode = t.dataset.mode;
+    current = null; answered = false; revealed = false; duel = null;
+    render();
+  };
+});
+document.querySelectorAll('.flash-chip').forEach(c => {
+  c.classList.toggle('on', parseInt(c.dataset.f, 10) === flashSecs);
+});
+document.querySelectorAll('.flash-chip').forEach(c => {
+  c.onclick = () => {
+    flashSecs = parseInt(c.dataset.f, 10);
+    localStorage.setItem(FLASH_KEY, String(flashSecs));
+    document.querySelectorAll('.flash-chip').forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+    if (mode === 'quiz' || mode === 'duel') { current = null; answered = false; duel = null; render(); }
+  };
+});
+document.querySelectorAll('#genderFilters .chip:not(.flash-chip)').forEach(c => {
+  c.onclick = () => {
+    document.querySelectorAll('#genderFilters .chip:not(.flash-chip)').forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+    gender = c.dataset.g;
+    current = null; answered = false; revealed = false; duel = null;
+    render();
+  };
+});
+
+let POSTERS = {};
+function computeRegions() {
+  REGIONS = activePack().regions.filter(r => FACES.some(f => f.region === r));
+}
+function renderPackChips() {
+  const el = document.getElementById('packFilters');
+  el.innerHTML = PACKS.map(p => {
+    const has = FACES.some(f => p.regions.includes(f.region));
+    return `<span class="chip pack-chip ${p.id === activePackId ? 'on' : ''} ${has ? '' : 'disabled'}" data-p="${p.id}">${p.flag} ${p.name}</span>`;
+  }).join('');
+  el.querySelectorAll('.pack-chip').forEach(c => {
+    c.onclick = () => {
+      if (c.classList.contains('disabled')) return;
+      activePackId = c.dataset.p;
+      localStorage.setItem(PACK_KEY, activePackId);
+      computeRegions();
+      current = null; answered = false; revealed = false; duel = null; learnRegion = null;
+      renderPackChips();
+      render();
+    };
+  });
+}
+fetch('manifest.json')
+  .then(r => r.json())
+  .then(m => {
+    FACES = m.faces;
+    POSTERS = m.posters || {};
+    computeRegions();
+    renderPackChips();
+    document.querySelectorAll('.style-chip').forEach(c => {
+      if (FACES.some(f => f.style === c.dataset.g)) c.style.display = '';
+    });
+    render();
+  })
+  .catch(() => render());
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
