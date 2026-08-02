@@ -185,8 +185,17 @@
     max-width: 480px;
     line-height: 1.45;
   }
-  button.ghost.rate { padding: 12px 16px; font-size: 17px; }
-  button.ghost.rate.voted { border-color: var(--accent); background: rgba(245,166,35,0.15); }
+  .rate-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--dim);
+    flex-wrap: wrap; justify-content: center;
+  }
+  .rate-row button {
+    background: var(--panel2); color: var(--text);
+    border: 1px solid #2c3444; border-radius: 8px;
+    padding: 4px 10px; font-size: 13px; cursor: pointer;
+  }
+  .rate-row button.voted { border-color: var(--accent); background: rgba(245,166,35,0.15); }
 
   .trait-card {
     background: var(--panel2);
@@ -473,10 +482,13 @@ function renderQuiz() {
       </div>
       <div class="controls" style="display:none" id="nextWrap">
         <button class="primary" id="nextBtn">Next →</button>
-        <button class="ghost rate" id="rateUp" title="Good likeness">👍</button>
-        <button class="ghost rate" id="rateDown" title="Doesn't look right">👎</button>
       </div>
       <div id="diffSlot"></div>
+      <div class="rate-row" style="display:none" id="rateRow">
+        <span id="rateLabel"></span>
+        <button id="rateUp" title="Good likeness">👍</button>
+        <button id="rateDown" title="Doesn't look right">👎</button>
+      </div>
       <div class="scorebar">
         <span class="level">🎖 <b>${lvl.name}</b> (${lvl.choices} choices)</span>
         <span>✅ <b>${session.right}</b></span>
@@ -513,7 +525,7 @@ function renderQuiz() {
         flipCompare(picked);
       }
       document.getElementById('nextWrap').style.display = 'flex';
-      wireRate(current.file);
+      wireRate(current.file, current.region);
       document.getElementById('nextBtn').onclick = () => { answered = 'advance'; renderQuiz(); };
     };
   });
@@ -603,10 +615,14 @@ function castVote(file, vote) {
   localStorage.setItem(VOTE_KEY, JSON.stringify(v));
   try { fetch(VOTE_URL, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file, vote }) }).catch(() => {}); } catch (e) {}
 }
-function wireRate(file) {
+function wireRate(file, region) {
+  const row = document.getElementById('rateRow');
   const up = document.getElementById('rateUp');
   const down = document.getElementById('rateDown');
-  if (!up || !down) return;
+  if (!row || !up || !down) return;
+  row.style.display = 'flex';
+  document.getElementById('rateLabel').textContent =
+    `Rate this AI representation of this ${region} person`;
   const sync = () => {
     const v = loadVotes()[file];
     up.classList.toggle('voted', v === 'up');
@@ -646,10 +662,13 @@ function renderDuel() {
       <div class="feedback" id="fb"></div>
       <div class="controls" style="display:none" id="nextWrap">
         <button class="primary" id="nextBtn">Next →</button>
-        <button class="ghost rate" id="rateUp" title="Good likeness">👍</button>
-        <button class="ghost rate" id="rateDown" title="Doesn't look right">👎</button>
       </div>
       <div id="diffSlot"></div>
+      <div class="rate-row" style="display:none" id="rateRow">
+        <span id="rateLabel"></span>
+        <button id="rateUp" title="Good likeness">👍</button>
+        <button id="rateDown" title="Doesn't look right">👎</button>
+      </div>
       <div class="scorebar">
         <span class="level">🎖 <b>${currentLevel().name}</b></span>
         <span>✅ <b>${session.right}</b></span>
@@ -680,7 +699,7 @@ function renderDuel() {
       fb.className = 'feedback ' + (ok ? 'good' : 'bad');
       if (!ok) document.getElementById('diffSlot').innerHTML = diffLineHTML(d.target, tapped.region);
       document.getElementById('nextWrap').style.display = 'flex';
-      wireRate(d.faces.find(f => f.region === d.target).file);
+      wireRate(d.faces.find(f => f.region === d.target).file, d.target);
       document.getElementById('nextBtn').onclick = () => { duel.done = 'advance'; renderDuel(); };
     };
   });
