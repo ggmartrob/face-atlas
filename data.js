@@ -315,5 +315,149 @@ const TRAITS = {
   Uzbek: {
     cues: ['Persian-Turkic crossroads: more West-Asian than Kazakh', 'Larger, rounder eyes with softer folds', 'Defined nose bridge; dark strong brows', 'Olive-tan skin; dark wavy hair'],
     confused: { Kazakh: 'Kazakhs read more East-Asian in the eyes and cheekbones.', Pakistani: 'Northern Pakistanis overlap; Uzbeks keep a Turkic eye hint.' }
+  },
+  // ——— Mideast additions ———
+  Iraqi: {
+    cues: ['Strong straight-to-convex nose, broad base', 'Heavy dark brows over deep-set eyes', 'Squarer jaw than Levantine neighbors', 'Olive-tan skin, dense black hair'],
+    confused: { Syrian: 'Syrians trend finer-boned; Iraqi faces read heavier in jaw and nose.', Saudi: 'Gulf faces trend longer and narrower; Iraqis broader in the midface.' }
+  },
+  Jordanian: {
+    cues: ['Levantine-Bedouin blend: long face, prominent nose', 'Angular cheekbones with a lean look', 'Dark, deep-set eyes under straight brows', 'Tan skin tone deeper than coastal Levantines'],
+    confused: { Palestinian: 'Extremely close; Jordanians trend slightly leaner and more Bedouin-angular.', Syrian: 'Syrians read softer and fairer on average.' }
+  },
+  Palestinian: {
+    cues: ['Classic Levantine balance: medium-strong nose, oval face', 'Expressive full brows, large dark eyes', 'Fuller lips than Gulf neighbors', 'Olive skin with warm undertone'],
+    confused: { Jordanian: 'Nearly identical pools; Jordanians trend more angular desert features.', Lebanese: 'Lebanese trend fairer with finer noses.' }
+  },
+  Yemeni: {
+    cues: ['Fine-boned, narrow face with sharp features', 'Prominent thin-bridged nose', 'Very dark, dense hair and brows; darker skin than Gulf average', 'Horn-of-Africa echo in some faces'],
+    confused: { Saudi: 'Saudis read broader and fairer; Yemenis finer and darker.', Somali: 'Somalis carry East-African features more strongly; Yemenis stay Arabian.' }
+  },
+  // ——— Central & South Asia additions ———
+  Kyrgyz: {
+    cues: ['Strongly East-Asian eye fold with low bridge', 'Broad, flat cheekbones — mountain-Turkic look', 'Rounder face than Kazakh on average', 'Straight black hair, sparse beard'],
+    confused: { Kazakh: 'Extremely close; Kyrgyz trend slightly rounder-faced and more uniformly East-Asian.', Mongolian: 'Mongolians read broader-jawed and heavier-boned.' }
+  },
+  Tajik: {
+    cues: ['Persian-featured: high nose bridge, larger rounded eyes', 'Most West-Asian of Central Asians', 'Dark wavy hair, strong brows, frequent beard shadow', 'Longer midface than Turkic neighbors'],
+    confused: { Uzbek: 'Uzbeks keep a Turkic eye hint; Tajiks read almost fully Persian.', Afghan: 'Heavy overlap; Afghans (Pashtun) trend more rugged and angular.' }
+  },
+  Turkmen: {
+    cues: ['Turkic-Persian blend: moderate fold with a defined nose', 'Long face with high forehead', 'Between Uzbek and Azerbaijani in overall look', 'Dark hair, weathered tan skin'],
+    confused: { Uzbek: 'Uzbeks trend rounder-faced; Turkmen longer and more hook-nosed.', Azerbaijani: 'Azerbaijanis read more Caucasus-Mediterranean.' }
+  },
+  Afghan: {
+    cues: ['Rugged, angular Pashtun structure: strong jaw, sharp cheekbones', 'Prominent aquiline nose', 'Light eyes (green/grey) not rare', 'Weathered skin, heavy brows and beard'],
+    confused: { Pakistani: 'Pashtun faces cross the border; Punjabi Pakistanis read softer and rounder.', Tajik: 'Tajiks trend smoother Persian features.' }
+  },
+  Nepali: {
+    cues: ['Himalayan blend: Indic features with East-Asian eye fold in many', 'Broad cheekbones with a compact midface', 'Warm brown skin, straight black hair', 'Flatter profile than Indian plains faces'],
+    confused: { Indian: 'Plains Indians lack the East-Asian eye hint most Nepalis carry.', Burmese: 'Burmese read more fully Southeast-Asian.' }
+  },
+  'Sri Lankan': {
+    cues: ['Deep brown skin with cool undertone', 'Large, very dark round eyes', 'Softer, rounder face than South Indian average', 'Dense black wavy hair'],
+    confused: { Indian: 'South Indians are closest; Sri Lankans trend rounder-faced and darker.', Bangladeshi: 'Bengalis carry a slight East-Asian hint Sri Lankans lack.' }
+  },
+  Laotian: {
+    cues: ['Classic mainland Southeast-Asian: golden-brown skin, wide cheekbones', 'Fuller lips and broader nose than Thai average', 'Rounder face than Vietnamese', 'Strong single-fold eyes common'],
+    confused: { Thai: 'Thais trend narrower-faced with finer features.', Cambodian: 'Khmer read broader-nosed and squarer-jawed; Lao softer.' }
+  },
+  // ——— Europe ———
+  Russian: {
+    cues: ['Broad face with wide-set, often light eyes', 'Softer, shorter nose with a lower bridge', 'High rounded cheekbones — a faint steppe echo', 'Fair skin; light-brown to blond hair common'],
+    confused: { Ukrainian: 'Extremely close; Ukrainians trend slightly darker-haired and warmer-toned.', Polish: 'Poles trend narrower-faced with sharper noses.' }
+  },
+  Ukrainian: {
+    cues: ['East-Slavic base with a warmer coloring than Russians', 'Rounded face, full cheeks', 'Straight medium nose', 'Dark-blond to brown hair, frequent green eyes'],
+    confused: { Russian: 'Russians trend fairer and flatter-cheeked.', Romanian: 'Romanians read more Balkan-Mediterranean.' }
+  },
+  Polish: {
+    cues: ['West-Slavic: narrower face than eastern neighbors', 'Sharper, more defined nose', 'Light eyes very common, often grey-blue', 'Fair skin with cool undertone'],
+    confused: { Russian: 'Russians trend broader-faced.', German: 'Germans read heavier-jawed; Poles finer.' }
+  },
+  Lithuanian: {
+    cues: ['Baltic look: strong straight nose, long face', 'Very fair — blond and light-eyed rates among Europe\'s highest', 'Pronounced cheekbone line', 'Cool, pale skin tone'],
+    confused: { Polish: 'Poles trend slightly darker and rounder.', Swedish: 'Swedes read softer-featured; Balts more angular.' }
+  },
+  German: {
+    cues: ['Central-European: strong jaw and chin', 'Medium-long face with a straight nose', 'Light eyes and mid-brown hair typical', 'Ruddier skin than Slavic neighbors'],
+    confused: { Polish: 'Poles trend finer-boned.', Swedish: 'Swedes trend longer-faced and blonder.' }
+  },
+  Swedish: {
+    cues: ['Nordic: long face, high flat cheekbones', 'Blond hair and blue eyes at very high rates', 'Straight, refined nose', 'Very fair, cool-toned skin'],
+    confused: { German: 'Germans read squarer and darker.', Lithuanian: 'Balts carry a heavier bone structure.' }
+  },
+  Italian: {
+    cues: ['Mediterranean: olive skin, dark expressive eyes', 'Prominent, often convex nose', 'Strong brows and dark thick hair', 'Expressive full mouth'],
+    confused: { Spanish: 'Spaniards trend softer-nosed and rounder-faced.', Greek: 'Greeks read wider-jawed with denser brows.' }
+  },
+  Spanish: {
+    cues: ['Iberian: olive-fair skin, warm brown eyes', 'Softer nose than Italian average', 'Rounder face with balanced features', 'Dark chestnut hair'],
+    confused: { Italian: 'Italians trend stronger-nosed and more angular.', Portuguese: 'Nearly identical; Portuguese trend slightly darker and rounder-eyed.' }
+  },
+  Portuguese: {
+    cues: ['Atlantic-Iberian: slightly darker than Spanish average', 'Large, round dark eyes', 'Compact face with soft features', 'Dense dark, often wavy hair'],
+    confused: { Spanish: 'Very close; Spaniards trend lighter.', Moroccan: 'Moroccans carry North-African structure — stronger nose, deeper tone.' }
+  },
+  Greek: {
+    cues: ['Aegean: wide jaw, strong chin', 'Dense, nearly-meeting brows common', 'Prominent straight "Greek" nose — bridge flows from forehead', 'Olive skin, very dark curls'],
+    confused: { Italian: 'Italians trend longer-faced.', Turkish: 'Turks read softer and rounder; Greeks more sculpted.' }
+  },
+  Serbian: {
+    cues: ['Dinaric: notably long face and tall skull', 'Strong, straight-to-convex nose', 'Deep-set light-or-dark eyes under straight brows', 'Dark hair with fair-olive skin'],
+    confused: { Bulgarian: 'Bulgarians trend rounder and slightly darker.', Albanian: 'Albanians trend finer-boned.' }
+  },
+  Albanian: {
+    cues: ['Fine-boned Balkan: narrow face, sharp features', 'Light eyes surprisingly common', 'Straight, thin nose', 'Dark-brown hair, olive-fair skin'],
+    confused: { Greek: 'Greeks trend heavier-browed and wider-jawed.', Serbian: 'Serbs read longer-faced and heavier-boned.' }
+  },
+  Bulgarian: {
+    cues: ['Slavic-Balkan mix: rounder face than Serbs', 'Medium nose with slight convexity', 'Warm olive skin, dark hair', 'Softer brow than Greek average'],
+    confused: { Serbian: 'Serbs trend longer-faced.', Romanian: 'Romanians carry a Latin softness; Bulgarians more Slavic-solid.' }
+  },
+  Romanian: {
+    cues: ['Latin island in the Balkans: softer, warmer features', 'Large brown eyes, gentle brow', 'Medium nose, often slightly aquiline', 'Chestnut-to-black hair, olive-fair skin'],
+    confused: { Bulgarian: 'Bulgarians read more Slavic-boned.', Hungarian: 'Hungarians trend broader-cheeked.' }
+  },
+  Hungarian: {
+    cues: ['Central-European with a faint Magyar-steppe echo in cheekbones', 'Broad midface, slightly almond eyes in some', 'Medium-strong nose', 'Brown hair, fair-olive skin'],
+    confused: { Romanian: 'Romanians trend softer and darker-eyed.', German: 'Germans lack the cheekbone echo.' }
+  },
+  // ——— Africa ———
+  Nigerian: {
+    cues: ['West-African: strong rounded features, full lips', 'Broad nose with wide nostril base', 'Deep ebony-to-dark-brown skin', 'Robust jaw and short midface'],
+    confused: { Ghanaian: 'Very close; Ghanaians trend slightly softer-featured.', Kenyan: 'East Africans trend narrower-faced.' }
+  },
+  Ghanaian: {
+    cues: ['West-African coastal: rounded face, warm deep-brown skin', 'Full lips with softer nose than Nigerian average', 'Wide, open eyes', 'Compact, smooth features'],
+    confused: { Nigerian: 'Nigerians trend more robust-jawed.', Senegalese: 'Senegalese trend taller-faced and darker.' }
+  },
+  Senegalese: {
+    cues: ['Sahelian: elongated face and slender features', 'Very dark, cool-toned skin', 'Finer nose than coastal West Africans', 'High, prominent cheekbones'],
+    confused: { Ghanaian: 'Ghanaians read rounder and warmer-toned.', Somali: 'Somalis carry Horn-of-Africa fineness with narrower noses.' }
+  },
+  Ethiopian: {
+    cues: ['Horn-of-Africa: fine, sculpted features', 'Narrow, high-bridged nose', 'Large almond eyes with striking lashes', 'Copper-to-brown skin, soft-curled hair'],
+    confused: { Somali: 'Extremely close; Somalis trend longer-faced and darker.', Yemeni: 'Yemenis sit across the strait — heavier brows, straighter hair.' }
+  },
+  Somali: {
+    cues: ['Elongated, elegant face — among the world\'s narrowest', 'Thin, straight nose', 'Dark brown skin with smooth even tone', 'High forehead, soft-curled hair'],
+    confused: { Ethiopian: 'Ethiopians trend rounder-faced and lighter.', Kenyan: 'Kenyans (Bantu) read broader-nosed and rounder.' }
+  },
+  Kenyan: {
+    cues: ['East-African Bantu: balanced oval face', 'Medium-broad nose, full lips', 'Rich dark-brown skin', 'Rounder features than Horn neighbors'],
+    confused: { Ethiopian: 'Ethiopians carry finer Horn features.', Nigerian: 'West Africans trend heavier-jawed and broader-nosed.' }
+  },
+  Moroccan: {
+    cues: ['Maghrebi: Berber-Arab blend, olive-to-tan skin', 'Strong, defined nose with high bridge', 'Dense dark brows over intense eyes', 'Angular cheekbones'],
+    confused: { Algerian: 'Nearly identical; Algerians trend slightly fairer.', Spanish: 'Iberians lack the Berber nose strength.' }
+  },
+  Algerian: {
+    cues: ['Berber base with Mediterranean mixture', 'Medium-strong nose, softer than Moroccan average', 'Fair-olive to tan skin range is wide', 'Dark wavy hair'],
+    confused: { Moroccan: 'Moroccans trend more rugged-featured.', Tunisian: 'Tunisians read softer and more Mediterranean.' }
+  },
+  Tunisian: {
+    cues: ['Most Mediterranean of the Maghreb', 'Softer, rounder features than Morocco/Algeria', 'Fair-olive skin common', 'Large dark eyes with gentle brow'],
+    confused: { Algerian: 'Algerians trend more Berber-angular.', Lebanese: 'Levantines read finer-nosed.' }
   }
 };
