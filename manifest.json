@@ -2201,6 +2201,54 @@
    "gender": "male"
   },
   {
+   "file": "ftd_afghan_female_1.jpg",
+   "region": "Afghan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_afghan_female_2.jpg",
+   "region": "Afghan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_afghan_female_3.jpg",
+   "region": "Afghan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_afghan_female_4.jpg",
+   "region": "Afghan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_afghan_male_1.jpg",
+   "region": "Afghan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_afghan_male_2.jpg",
+   "region": "Afghan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_afghan_male_3.jpg",
+   "region": "Afghan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_afghan_male_4.jpg",
+   "region": "Afghan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
    "file": "ftd_argentinian_female_1.jpg",
    "region": "Argentinian",
    "gender": "female",
@@ -3449,6 +3497,102 @@
    "style": "drawing"
   },
   {
+   "file": "ftd_kyrgyz_female_1.jpg",
+   "region": "Kyrgyz",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_kyrgyz_female_2.jpg",
+   "region": "Kyrgyz",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_kyrgyz_female_3.jpg",
+   "region": "Kyrgyz",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_kyrgyz_female_4.jpg",
+   "region": "Kyrgyz",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_kyrgyz_male_1.jpg",
+   "region": "Kyrgyz",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_kyrgyz_male_2.jpg",
+   "region": "Kyrgyz",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_kyrgyz_male_3.jpg",
+   "region": "Kyrgyz",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_kyrgyz_male_4.jpg",
+   "region": "Kyrgyz",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_female_1.jpg",
+   "region": "Laotian",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_female_2.jpg",
+   "region": "Laotian",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_female_3.jpg",
+   "region": "Laotian",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_female_4.jpg",
+   "region": "Laotian",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_male_1.jpg",
+   "region": "Laotian",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_male_2.jpg",
+   "region": "Laotian",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_male_3.jpg",
+   "region": "Laotian",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_laotian_male_4.jpg",
+   "region": "Laotian",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
    "file": "ftd_lebanese_female_1.jpg",
    "region": "Lebanese",
    "gender": "female",
@@ -3637,6 +3781,54 @@
   {
    "file": "ftd_mongolian_male_4.jpg",
    "region": "Mongolian",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_female_1.jpg",
+   "region": "Nepali",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_female_2.jpg",
+   "region": "Nepali",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_female_3.jpg",
+   "region": "Nepali",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_female_4.jpg",
+   "region": "Nepali",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_male_1.jpg",
+   "region": "Nepali",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_male_2.jpg",
+   "region": "Nepali",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_male_3.jpg",
+   "region": "Nepali",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_nepali_male_4.jpg",
+   "region": "Nepali",
    "gender": "male",
    "style": "drawing"
   },
@@ -3977,6 +4169,54 @@
    "style": "drawing"
   },
   {
+   "file": "ftd_srilankan_female_1.jpg",
+   "region": "Sri Lankan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_srilankan_female_2.jpg",
+   "region": "Sri Lankan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_srilankan_female_3.jpg",
+   "region": "Sri Lankan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_srilankan_female_4.jpg",
+   "region": "Sri Lankan",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_srilankan_male_1.jpg",
+   "region": "Sri Lankan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_srilankan_male_2.jpg",
+   "region": "Sri Lankan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_srilankan_male_3.jpg",
+   "region": "Sri Lankan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_srilankan_male_4.jpg",
+   "region": "Sri Lankan",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
    "file": "ftd_syrian_female_1.jpg",
    "region": "Syrian",
    "gender": "female",
@@ -4021,6 +4261,54 @@
   {
    "file": "ftd_syrian_male_4.jpg",
    "region": "Syrian",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_female_1.jpg",
+   "region": "Tajik",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_female_2.jpg",
+   "region": "Tajik",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_female_3.jpg",
+   "region": "Tajik",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_female_4.jpg",
+   "region": "Tajik",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_male_1.jpg",
+   "region": "Tajik",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_male_2.jpg",
+   "region": "Tajik",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_male_3.jpg",
+   "region": "Tajik",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_tajik_male_4.jpg",
+   "region": "Tajik",
    "gender": "male",
    "style": "drawing"
   },
@@ -4117,6 +4405,54 @@
   {
    "file": "ftd_turkish_male_4.jpg",
    "region": "Turkish",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_female_1.jpg",
+   "region": "Turkmen",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_female_2.jpg",
+   "region": "Turkmen",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_female_3.jpg",
+   "region": "Turkmen",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_female_4.jpg",
+   "region": "Turkmen",
+   "gender": "female",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_male_1.jpg",
+   "region": "Turkmen",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_male_2.jpg",
+   "region": "Turkmen",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_male_3.jpg",
+   "region": "Turkmen",
+   "gender": "male",
+   "style": "drawing"
+  },
+  {
+   "file": "ftd_turkmen_male_4.jpg",
+   "region": "Turkmen",
    "gender": "male",
    "style": "drawing"
   },
