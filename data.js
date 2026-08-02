@@ -6,9 +6,9 @@
 const PACKS = [
   {
     id: 'mideast', name: 'Middle East & Caucasus', flag: '🌍',
-    regions: ['Armenian', 'Georgian', 'Azerbaijani', 'Iranian', 'Turkish', 'Kurdish', 'Lebanese', 'Syrian', 'Egyptian', 'Saudi'],
+    regions: ['Armenian', 'Georgian', 'Azerbaijani', 'Iranian', 'Turkish', 'Kurdish', 'Lebanese', 'Syrian', 'Egyptian', 'Saudi', 'Iraqi', 'Jordanian', 'Palestinian', 'Yemeni'],
     rookie: ['Saudi', 'Egyptian', 'Turkish', 'Armenian', 'Georgian'],
-    spotter: ['Saudi', 'Egyptian', 'Turkish', 'Armenian', 'Georgian', 'Iranian', 'Lebanese', 'Kurdish']
+    spotter: ['Saudi', 'Egyptian', 'Turkish', 'Armenian', 'Georgian', 'Iranian', 'Lebanese', 'Kurdish', 'Iraqi', 'Yemeni']
   },
   {
     id: 'centralamerica', name: 'Central America', flag: '🌎',
@@ -24,9 +24,21 @@ const PACKS = [
   },
   {
     id: 'asia', name: 'Asia', flag: '🌏',
-    regions: ['Chinese', 'Japanese', 'Korean', 'Mongolian', 'Vietnamese', 'Thai', 'Filipino', 'Indonesian', 'Malaysian', 'Cambodian', 'Burmese', 'Indian', 'Pakistani', 'Bangladeshi', 'Kazakh', 'Uzbek'],
+    regions: ['Chinese', 'Japanese', 'Korean', 'Mongolian', 'Vietnamese', 'Thai', 'Filipino', 'Indonesian', 'Malaysian', 'Cambodian', 'Burmese', 'Indian', 'Pakistani', 'Bangladeshi', 'Kazakh', 'Uzbek', 'Kyrgyz', 'Tajik', 'Turkmen', 'Afghan', 'Nepali', 'Sri Lankan', 'Laotian'],
     rookie: ['Japanese', 'Thai', 'Indian', 'Kazakh', 'Filipino'],
-    spotter: ['Japanese', 'Thai', 'Indian', 'Kazakh', 'Filipino', 'Chinese', 'Korean', 'Vietnamese', 'Indonesian', 'Pakistani']
+    spotter: ['Japanese', 'Thai', 'Indian', 'Kazakh', 'Filipino', 'Chinese', 'Korean', 'Vietnamese', 'Indonesian', 'Pakistani', 'Kyrgyz', 'Afghan']
+  },
+  {
+    id: 'europe', name: 'Europe', flag: '🇪🇺',
+    regions: ['Russian', 'Ukrainian', 'Polish', 'Lithuanian', 'German', 'Swedish', 'Italian', 'Spanish', 'Portuguese', 'Greek', 'Serbian', 'Albanian', 'Bulgarian', 'Romanian', 'Hungarian'],
+    rookie: ['Swedish', 'Italian', 'Russian', 'Greek', 'German'],
+    spotter: ['Swedish', 'Italian', 'Russian', 'Greek', 'German', 'Spanish', 'Polish', 'Serbian', 'Romanian']
+  },
+  {
+    id: 'africa', name: 'Africa', flag: '🌍',
+    regions: ['Nigerian', 'Ghanaian', 'Senegalese', 'Ethiopian', 'Somali', 'Kenyan', 'Moroccan', 'Algerian', 'Tunisian'],
+    rookie: ['Nigerian', 'Ethiopian', 'Moroccan', 'Kenyan'],
+    spotter: ['Nigerian', 'Ethiopian', 'Moroccan', 'Kenyan', 'Somali', 'Senegalese', 'Algerian']
   }
 ];
 
@@ -77,8 +89,47 @@ const NEIGHBORS = {
   Indian: ['Pakistani', 'Bangladeshi'],
   Pakistani: ['Indian', 'Bangladeshi', 'Uzbek'],
   Bangladeshi: ['Indian', 'Burmese', 'Pakistani'],
-  Kazakh: ['Mongolian', 'Uzbek', 'Korean'],
-  Uzbek: ['Kazakh', 'Pakistani', 'Mongolian']
+  Kazakh: ['Mongolian', 'Uzbek', 'Korean', 'Kyrgyz'],
+  Uzbek: ['Kazakh', 'Pakistani', 'Mongolian', 'Tajik'],
+  // Central & South Asia additions
+  Kyrgyz: ['Kazakh', 'Mongolian', 'Uzbek'],
+  Tajik: ['Uzbek', 'Afghan', 'Iranian'],
+  Turkmen: ['Uzbek', 'Azerbaijani', 'Iranian'],
+  Afghan: ['Pakistani', 'Tajik', 'Iranian'],
+  Nepali: ['Indian', 'Burmese', 'Bangladeshi'],
+  'Sri Lankan': ['Indian', 'Bangladeshi', 'Nepali'],
+  Laotian: ['Thai', 'Cambodian', 'Vietnamese'],
+  // Mideast additions
+  Iraqi: ['Syrian', 'Jordanian', 'Kurdish', 'Saudi'],
+  Jordanian: ['Palestinian', 'Syrian', 'Iraqi'],
+  Palestinian: ['Jordanian', 'Lebanese', 'Syrian'],
+  Yemeni: ['Saudi', 'Somali', 'Egyptian'],
+  // Europe
+  Russian: ['Ukrainian', 'Polish', 'Lithuanian'],
+  Ukrainian: ['Russian', 'Polish', 'Romanian'],
+  Polish: ['Ukrainian', 'Russian', 'German', 'Lithuanian'],
+  Lithuanian: ['Polish', 'Russian', 'Swedish'],
+  German: ['Polish', 'Swedish', 'Hungarian'],
+  Swedish: ['German', 'Lithuanian', 'Russian'],
+  Italian: ['Spanish', 'Greek', 'Portuguese'],
+  Spanish: ['Italian', 'Portuguese', 'Greek'],
+  Portuguese: ['Spanish', 'Italian', 'Moroccan'],
+  Greek: ['Italian', 'Albanian', 'Bulgarian', 'Turkish'],
+  Serbian: ['Bulgarian', 'Romanian', 'Albanian'],
+  Albanian: ['Greek', 'Serbian', 'Italian'],
+  Bulgarian: ['Serbian', 'Romanian', 'Greek'],
+  Romanian: ['Bulgarian', 'Hungarian', 'Serbian'],
+  Hungarian: ['Romanian', 'German', 'Serbian'],
+  // Africa
+  Nigerian: ['Ghanaian', 'Senegalese', 'Kenyan'],
+  Ghanaian: ['Nigerian', 'Senegalese', 'Kenyan'],
+  Senegalese: ['Ghanaian', 'Nigerian', 'Kenyan'],
+  Ethiopian: ['Somali', 'Kenyan', 'Yemeni'],
+  Somali: ['Ethiopian', 'Kenyan', 'Yemeni'],
+  Kenyan: ['Ethiopian', 'Nigerian', 'Somali'],
+  Moroccan: ['Algerian', 'Tunisian', 'Spanish'],
+  Algerian: ['Moroccan', 'Tunisian', 'Egyptian'],
+  Tunisian: ['Algerian', 'Moroccan', 'Egyptian']
 };
 
 const TRAITS = {
