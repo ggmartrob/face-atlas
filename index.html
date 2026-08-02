@@ -175,6 +175,19 @@
   .feedback.good { color: var(--good); }
   .feedback.bad { color: var(--bad); }
 
+  .diff-line {
+    font-size: 14px;
+    color: var(--text);
+    background: rgba(245,166,35,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 8px 12px;
+    max-width: 480px;
+    line-height: 1.45;
+  }
+  button.ghost.rate { padding: 12px 16px; font-size: 17px; }
+  button.ghost.rate.voted { border-color: var(--accent); background: rgba(245,166,35,0.15); }
+
   .trait-card {
     background: var(--panel2);
     border: 1px solid #2c3444;
@@ -246,16 +259,6 @@
   .duel-wrong-dim { opacity: 0.75; }
   .duel-tapped-wrong { border-color: var(--bad); opacity: 1; }
 
-  /* Flash mode: face hides after N seconds — answer from memory */
-  .flash-cover {
-    position: absolute; inset: 0;
-    background: var(--panel2);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 8px; color: var(--dim); font-size: 15px;
-    z-index: 2;
-  }
-  .flash-cover .q { font-size: 52px; }
 
   .blind-spots { width: 100%; }
   .blind-spots .bs-row {
@@ -300,10 +303,6 @@
     <span class="chip" data-g="male">Men</span>
     <span class="chip style-chip" data-g="hot" style="display:none">🔥 Hot</span>
     <span class="chip style-chip" data-g="fitness" style="display:none">💪 Fitness</span>
-    <span style="width:12px"></span>
-    <span class="chip flash-chip" data-f="0">⏱ Off</span>
-    <span class="chip flash-chip on" data-f="3">⏱ 3s</span>
-    <span class="chip flash-chip" data-f="5">⏱ 5s</span>
   </div>
   <div id="view"></div>
 </main>
@@ -375,33 +374,6 @@ function pickDistractors(actual, n, pool) {
   return out;
 }
 
-// Flash mode: in Quiz/Duel the face is covered after N seconds, so you answer
-// from the glimpse — trains fast recognition. 0 = off.
-const FLASH_KEY = 'faceatlas_flash_v1';
-let flashSecs = parseInt(localStorage.getItem(FLASH_KEY) || '3', 10);
-let flashTimers = [];
-function clearFlash() {
-  flashTimers.forEach(t => clearTimeout(t));
-  flashTimers = [];
-}
-function armFlash(selector) {
-  clearFlash();
-  if (!flashSecs) return;
-  flashTimers.push(setTimeout(() => {
-    document.querySelectorAll(selector).forEach(el => {
-      if (el.querySelector('.flash-cover')) return;
-      const c = document.createElement('div');
-      c.className = 'flash-cover';
-      c.innerHTML = '<div class="q">🙈</div><div>From memory…</div>';
-      el.appendChild(c);
-    });
-  }, flashSecs * 1000));
-}
-function unflash() {
-  clearFlash();
-  document.querySelectorAll('.flash-cover').forEach(el => el.remove());
-}
-
 let FACES = [];
 let REGIONS = [];
 let mode = 'learn';
@@ -452,7 +424,6 @@ function shuffle(a) {
 const view = document.getElementById('view');
 
 function render() {
-  unflash();
   if (!FACES.length) {
     view.innerHTML = '<div class="empty">No faces loaded yet.<br>Run the harvest step to fill <code>faces/</code> and <code>manifest.json</code>.</div>';
     return;
@@ -500,10 +471,12 @@ function renderQuiz() {
       <div class="choices" id="choices" style="grid-template-columns: repeat(${Math.min(lvl.choices, 2)}, 1fr)">
         ${options.map(o => `<button data-r="${o}">${o}</button>`).join('')}
       </div>
-      <div id="traitSlot"></div>
       <div class="controls" style="display:none" id="nextWrap">
         <button class="primary" id="nextBtn">Next →</button>
+        <button class="ghost rate" id="rateUp" title="Good likeness">👍</button>
+        <button class="ghost rate" id="rateDown" title="Doesn't look right">👎</button>
       </div>
+      <div id="diffSlot"></div>
       <div class="scorebar">
         <span class="level">🎖 <b>${lvl.name}</b> (${lvl.choices} choices)</span>
         <span>✅ <b>${session.right}</b></span>
@@ -512,12 +485,10 @@ function renderQuiz() {
         <span>🏆 best <b>${session.best}</b></span>
       </div>
     </div>`;
-  armFlash('.face-wrap');
   document.querySelectorAll('#choices button').forEach(btn => {
     btn.onclick = () => {
       if (answered) return;
       answered = true;
-      unflash();
       const ok = btn.dataset.r === current.region;
       const picked = btn.dataset.r;
       bumpStat(current.region, ok);
@@ -537,9 +508,12 @@ function renderQuiz() {
         `<span class="level">🎖 <b>${lvlNow.name}</b> (${lvlNow.choices} choices)</span>` +
         `<span>✅ <b>${session.right}</b></span><span>❌ <b>${session.wrong}</b></span>` +
         `<span class="streak">🔥 streak <b>${session.streak}</b></span><span>🏆 best <b>${session.best}</b></span>`;
-      showTraitCard(current.region, ok ? null : picked);
-      if (!ok) flipCompare(picked);
+      if (!ok) {
+        document.getElementById('diffSlot').innerHTML = diffLineHTML(current.region, picked);
+        flipCompare(picked);
+      }
       document.getElementById('nextWrap').style.display = 'flex';
+      wireRate(current.file);
       document.getElementById('nextBtn').onclick = () => { answered = 'advance'; renderQuiz(); };
     };
   });
@@ -600,9 +574,47 @@ function traitCardHTML(region, pickedWrong) {
   const inner = traitInnerHTML(region, pickedWrong);
   return inner ? `<div class="trait-card">${inner}</div>` : '';
 }
-function showTraitCard(region, pickedWrong) {
-  const slot = document.getElementById('traitSlot');
-  if (slot) slot.innerHTML = traitCardHTML(region, pickedWrong);
+// One-liner shown after a miss: the shortest useful contrast between the two
+// regions. Uses the curated confused-pair sentence when we have one, otherwise
+// composes from each region's first cue.
+function diffLineHTML(actual, picked) {
+  const t = TRAITS[actual] || {};
+  let text;
+  if (t.confused && t.confused[picked]) {
+    text = t.confused[picked];
+  } else {
+    const a = (t.cues || [''])[0];
+    const p = ((TRAITS[picked] || {}).cues || [''])[0];
+    text = `${actual}: ${a.toLowerCase()}. ${picked}: ${p.toLowerCase()}.`;
+  }
+  return `<div class="diff-line">💡 ${text}</div>`;
+}
+
+// 👍/👎 face-quality votes. Stored locally (so buttons remember) and reported
+// to the central collector on the 3DMC server so bad generations can be pruned.
+const VOTE_KEY = 'faceatlas_votes_v1';
+const VOTE_URL = 'https://3dmusclecomics.com/race/vote.php';
+function loadVotes() {
+  try { return JSON.parse(localStorage.getItem(VOTE_KEY)) || {}; } catch { return {}; }
+}
+function castVote(file, vote) {
+  const v = loadVotes();
+  v[file] = vote;
+  localStorage.setItem(VOTE_KEY, JSON.stringify(v));
+  try { fetch(VOTE_URL, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file, vote }) }).catch(() => {}); } catch (e) {}
+}
+function wireRate(file) {
+  const up = document.getElementById('rateUp');
+  const down = document.getElementById('rateDown');
+  if (!up || !down) return;
+  const sync = () => {
+    const v = loadVotes()[file];
+    up.classList.toggle('voted', v === 'up');
+    down.classList.toggle('voted', v === 'down');
+  };
+  up.onclick = () => { castVote(file, 'up'); sync(); };
+  down.onclick = () => { castVote(file, 'down'); sync(); };
+  sync();
 }
 
 // Duel: two faces side by side, "tap the {target}". The rival region is chosen
@@ -632,10 +644,12 @@ function renderDuel() {
           </div>`).join('')}
       </div>
       <div class="feedback" id="fb"></div>
-      <div id="traitSlot"></div>
       <div class="controls" style="display:none" id="nextWrap">
         <button class="primary" id="nextBtn">Next →</button>
+        <button class="ghost rate" id="rateUp" title="Good likeness">👍</button>
+        <button class="ghost rate" id="rateDown" title="Doesn't look right">👎</button>
       </div>
+      <div id="diffSlot"></div>
       <div class="scorebar">
         <span class="level">🎖 <b>${currentLevel().name}</b></span>
         <span>✅ <b>${session.right}</b></span>
@@ -643,12 +657,10 @@ function renderDuel() {
         <span class="streak">🔥 streak <b>${session.streak}</b></span>
       </div>
     </div>`;
-  armFlash('.duel-face');
   document.querySelectorAll('.duel-face').forEach(el => {
     el.onclick = () => {
       if (d.done) return;
       d.done = true;
-      unflash();
       const tapped = d.faces[+el.dataset.i];
       const ok = tapped.region === d.target;
       bumpStat(d.target, ok);
@@ -666,8 +678,9 @@ function renderDuel() {
       const fb = document.getElementById('fb');
       fb.textContent = ok ? 'Correct!' : `That one is ${tapped.region}.`;
       fb.className = 'feedback ' + (ok ? 'good' : 'bad');
-      showTraitCard(d.target, ok ? d.rival : tapped.region);
+      if (!ok) document.getElementById('diffSlot').innerHTML = diffLineHTML(d.target, tapped.region);
       document.getElementById('nextWrap').style.display = 'flex';
+      wireRate(d.faces.find(f => f.region === d.target).file);
       document.getElementById('nextBtn').onclick = () => { duel.done = 'advance'; renderDuel(); };
     };
   });
@@ -736,21 +749,9 @@ document.querySelectorAll('.tab').forEach(t => {
     render();
   };
 });
-document.querySelectorAll('.flash-chip').forEach(c => {
-  c.classList.toggle('on', parseInt(c.dataset.f, 10) === flashSecs);
-});
-document.querySelectorAll('.flash-chip').forEach(c => {
+document.querySelectorAll('#genderFilters .chip').forEach(c => {
   c.onclick = () => {
-    flashSecs = parseInt(c.dataset.f, 10);
-    localStorage.setItem(FLASH_KEY, String(flashSecs));
-    document.querySelectorAll('.flash-chip').forEach(x => x.classList.remove('on'));
-    c.classList.add('on');
-    if (mode === 'quiz' || mode === 'duel') { current = null; answered = false; duel = null; render(); }
-  };
-});
-document.querySelectorAll('#genderFilters .chip:not(.flash-chip)').forEach(c => {
-  c.onclick = () => {
-    document.querySelectorAll('#genderFilters .chip:not(.flash-chip)').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('#genderFilters .chip').forEach(x => x.classList.remove('on'));
     c.classList.add('on');
     gender = c.dataset.g;
     current = null; answered = false; revealed = false; duel = null;
