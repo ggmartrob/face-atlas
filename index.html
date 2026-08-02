@@ -312,6 +312,7 @@
     <span class="chip" data-g="male">Men</span>
     <span class="chip style-chip" data-g="hot" style="display:none">🔥 Hot</span>
     <span class="chip style-chip" data-g="fitness" style="display:none">💪 Fitness</span>
+    <span class="chip style-chip" data-g="drawing" style="display:none">🎨 Drawings</span>
   </div>
   <div id="view"></div>
 </main>
@@ -409,7 +410,7 @@ function bumpStat(region, ok) {
 function pool(regionLimit) {
   return FACES.filter(f => {
     if (regionLimit && !regionLimit.includes(f.region)) return false;
-    if (gender === 'hot' || gender === 'fitness') return f.style === gender;
+    if (gender !== 'all' && gender !== 'male' && gender !== 'female') return f.style === gender;
     if (f.style) return false; // styled faces stay out of standard play
     return gender === 'all' || f.gender === gender;
   });
