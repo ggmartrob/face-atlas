@@ -1,6 +1,6 @@
 // Face Atlas service worker — cache-first for the app shell, runtime cache for faces.
-const CACHE = 'faceatlas-v1';
-const SHELL = ['.', 'index.html', 'manifest.json', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
+const CACHE = 'faceatlas-v2';
+const SHELL = ['.', 'index.html', 'data.js', 'manifest.json', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -17,7 +17,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
   // network-first for the two manifests + index so updates land; cache-first for faces
-  const networkFirst = /(?:^|\/)(index\.html|manifest\.json|manifest\.webmanifest)?$/.test(url.pathname);
+  const networkFirst = /(?:^|\/)(index\.html|data\.js|manifest\.json|manifest\.webmanifest)?$/.test(url.pathname);
   if (networkFirst) {
     e.respondWith(
       fetch(e.request).then(r => {

@@ -277,6 +277,47 @@
   }
   .blind-spots .bs-row b { color: var(--bad); }
 
+  /* Splash / intro screen */
+  #splash {
+    position: fixed; inset: 0; z-index: 50;
+    background: radial-gradient(1200px 700px at 50% -10%, #17202e 0%, var(--bg) 60%);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 26px 16px calc(24px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+  #splash.hidden { display: none; }
+  .splash-title { font-size: 30px; letter-spacing: 1px; }
+  .splash-title span { color: var(--accent); }
+  .splash-sub { color: var(--dim); font-size: 14px; margin: 6px 0 14px; text-align: center; }
+  .globe-wrap { width: min(400px, 90vw); }
+  .globe-wrap svg { width: 100%; height: auto; display: block; }
+  .continent { cursor: pointer; }
+  .continent path { fill: #2e5d49; stroke: #3f7a5f; stroke-width: 1.5; transition: fill .15s; }
+  .continent text {
+    fill: #eaf6ef; font-size: 14px; font-weight: 700; pointer-events: none;
+    text-anchor: middle; paint-order: stroke; stroke: rgba(0,0,0,.6); stroke-width: 3px;
+  }
+  .continent:hover path { fill: var(--accent); stroke: #ffd27d; }
+  .continent.dim { cursor: default; }
+  .continent.dim path { fill: #26303f; stroke: #334055; }
+  .continent.dim text { fill: #5b6577; font-size: 11px; }
+  .splash-actions { display: flex; gap: 10px; margin: 12px 0 4px; flex-wrap: wrap; justify-content: center; }
+  .mode-cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px; width: min(560px, 94vw); margin-top: 10px;
+  }
+  .mode-card {
+    background: var(--panel); border: 1px solid #2c3444; border-radius: 14px;
+    padding: 14px; cursor: pointer; text-align: left; transition: border-color .15s, transform .1s;
+  }
+  .mode-card:hover { border-color: var(--accent); }
+  .mode-card:active { transform: scale(.97); }
+  .mode-card .mc-emoji { font-size: 24px; }
+  .mode-card .mc-name { font-weight: 700; margin: 6px 0 2px; }
+  .mode-card .mc-desc { font-size: 12px; color: var(--dim); line-height: 1.4; }
+  .splash-back { background: none; border: none; color: var(--dim); font-size: 14px; cursor: pointer; margin-top: 14px; text-decoration: underline; }
+  h1 { cursor: pointer; }
+
   /* Mobile-first: this is destined to be a phone game (9:16). */
   @media (max-width: 640px) {
     header { padding: 10px 12px 4px; }
@@ -294,6 +335,7 @@
 </style>
 </head>
 <body>
+<div id="splash" class="hidden"></div>
 <header>
   <h1>Face <span>Atlas</span> <small style="color:var(--dim);font-weight:400;font-size:13px">regional face trainer</small></h1>
   <nav>
@@ -328,7 +370,17 @@ const LEVELS = [
 ];
 const PACK_KEY = 'faceatlas_pack_v1';
 let activePackId = localStorage.getItem(PACK_KEY) || 'mideast';
+// Virtual "all continents" pack: union of every pack, for cross-pack play.
+function allPack() {
+  return {
+    id: 'all', name: 'All Continents', flag: '🌐',
+    regions: PACKS.flatMap(p => p.regions),
+    rookie: PACKS.flatMap(p => p.rookie),
+    spotter: PACKS.flatMap(p => p.spotter)
+  };
+}
 function activePack() {
+  if (activePackId === 'all') return allPack();
   return PACKS.find(p => p.id === activePackId) || PACKS[0];
 }
 function lifetimeRight() {
@@ -785,7 +837,7 @@ function computeRegions() {
 }
 function renderPackChips() {
   const el = document.getElementById('packFilters');
-  el.innerHTML = PACKS.map(p => {
+  el.innerHTML = [allPack(), ...PACKS].map(p => {
     const has = FACES.some(f => p.regions.includes(f.region));
     return `<span class="chip pack-chip ${p.id === activePackId ? 'on' : ''} ${has ? '' : 'disabled'}" data-p="${p.id}">${p.flag} ${p.name}</span>`;
   }).join('');
@@ -801,6 +853,97 @@ function renderPackChips() {
     };
   });
 }
+// ---------- Splash / intro ----------
+// Landing screen: pick a continent on the globe (or all), then pick a mode.
+// Learn is intentionally listed last — it's the study room, not the game.
+const splashEl = document.getElementById('splash');
+const MODE_CARDS = [
+  { m: 'quiz',   e: '⚡', n: 'Quiz',   d: 'Guess the region — choices grow with your level' },
+  { m: 'duel',   e: '⚔️', n: 'Duel',   d: 'Two faces side by side — tap the target' },
+  { m: 'traits', e: '📖', n: 'Traits', d: 'Cue cards: how to spot each region' },
+  { m: 'stats',  e: '📊', n: 'Stats',  d: 'Accuracy, level and blind spots' },
+  { m: 'learn',  e: '🖼', n: 'Learn',  d: 'Browse every face by region — study room' }
+];
+// Stylized globe: rough continent blobs, enough to click, not an atlas.
+const GLOBE_SVG = `
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="200" cy="200" r="188" fill="#173a52" stroke="#2a5d80" stroke-width="3"/>
+  <g class="continent" data-pack="centralamerica">
+    <path d="M60,120 C80,88 132,78 152,100 C170,116 164,142 148,156 C132,170 118,176 110,196 C102,216 92,226 82,214 C66,196 50,152 60,120 Z"/>
+    <text x="106" y="146">Central</text><text x="106" y="162">America</text>
+  </g>
+  <g class="continent" data-pack="southamerica">
+    <path d="M148,214 C168,202 190,212 193,238 C196,268 182,306 166,320 C150,332 137,322 134,296 C131,266 133,226 148,214 Z"/>
+    <text x="163" y="268">South</text><text x="163" y="284">America</text>
+  </g>
+  <g class="continent dim" data-pack="">
+    <path d="M222,96 C238,84 260,87 266,100 C270,112 256,121 240,123 C226,125 214,108 222,96 Z"/>
+    <text x="243" y="110">Europe</text>
+  </g>
+  <g class="continent dim" data-pack="">
+    <path d="M222,136 C242,124 266,132 271,155 C276,180 268,210 252,226 C237,240 220,231 216,205 C212,180 210,148 222,136 Z"/>
+    <text x="243" y="182">Africa</text>
+  </g>
+  <g class="continent" data-pack="asia">
+    <path d="M298,78 C330,64 362,84 370,116 C378,148 360,178 334,187 C313,194 298,181 293,160 C288,138 284,92 298,78 Z"/>
+    <text x="340" y="120">Asia</text>
+  </g>
+  <g class="continent" data-pack="mideast">
+    <path d="M272,130 C290,118 310,126 312,144 C314,162 298,172 283,168 C268,164 264,140 272,130 Z"/>
+    <text x="289" y="152">Middle</text><text x="289" y="166">East</text>
+  </g>
+</svg>`;
+function renderSplash(step, packId) {
+  if (step === 'mode') {
+    const p = packId === 'all' ? allPack() : PACKS.find(x => x.id === packId);
+    splashEl.innerHTML = `
+      <div class="splash-title">Face <span>Atlas</span></div>
+      <div class="splash-sub">${p.flag} <b>${p.name}</b> — pick how you want to train</div>
+      <div class="mode-cards">
+        ${MODE_CARDS.map(c => `
+          <div class="mode-card" data-m="${c.m}">
+            <div class="mc-emoji">${c.e}</div>
+            <div class="mc-name">${c.n}</div>
+            <div class="mc-desc">${c.d}</div>
+          </div>`).join('')}
+      </div>
+      <button class="splash-back">← pick a different continent</button>`;
+    splashEl.querySelectorAll('.mode-card').forEach(c => {
+      c.onclick = () => enterApp(packId, c.dataset.m);
+    });
+    splashEl.querySelector('.splash-back').onclick = () => renderSplash();
+    return;
+  }
+  splashEl.innerHTML = `
+    <div class="splash-title">Face <span>Atlas</span></div>
+    <div class="splash-sub">Learn to tell the world's faces apart.<br>Tap a continent to start.</div>
+    <div class="globe-wrap">${GLOBE_SVG}</div>
+    <div class="splash-actions">
+      <button class="primary" id="allPacksBtn">🌐 All continents at once</button>
+    </div>`;
+  splashEl.querySelectorAll('.continent').forEach(g => {
+    const pid = g.dataset.pack;
+    if (!pid) return;
+    const hasFaces = FACES.some(f => (PACKS.find(p => p.id === pid) || { regions: [] }).regions.includes(f.region));
+    if (!hasFaces) { g.classList.add('dim'); return; }
+    g.onclick = () => renderSplash('mode', pid);
+  });
+  splashEl.querySelector('#allPacksBtn').onclick = () => renderSplash('mode', 'all');
+}
+function enterApp(packId, modeSel) {
+  activePackId = packId;
+  localStorage.setItem(PACK_KEY, activePackId);
+  computeRegions();
+  renderPackChips();
+  mode = modeSel;
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.mode === mode));
+  current = null; answered = false; revealed = false; duel = null; learnRegion = null;
+  splashEl.classList.add('hidden');
+  render();
+}
+// App title returns to the splash from anywhere.
+document.querySelector('h1').onclick = () => { renderSplash(); splashEl.classList.remove('hidden'); };
+
 fetch('manifest.json')
   .then(r => r.json())
   .then(m => {
@@ -812,6 +955,8 @@ fetch('manifest.json')
       if (FACES.some(f => f.style === c.dataset.g)) c.style.display = '';
     });
     render();
+    renderSplash();
+    splashEl.classList.remove('hidden');
   })
   .catch(() => render());
 
